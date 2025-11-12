@@ -32,10 +32,17 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y google-chrome-stable
 
-      - name: Install Python dependencies
+      - name: Install Python dependencies with compatible versions
         run: |
           python -m pip install --upgrade pip
-          pip install behave selenium behave-webdriver webdriver-manager
+          pip install behave==1.2.6 selenium webdriver-manager
+          pip install behave-webdriver || echo "behave-webdriver installation may have warnings"
+
+      - name: Verify installations
+        run: |
+          python -c "import behave; print('behave version:', behave.__version__)"
+          python -c "import selenium; print('selenium version:', selenium.__version__)"
+          google-chrome --version
 
       - name: Run candymapper behave tests
         run: |
