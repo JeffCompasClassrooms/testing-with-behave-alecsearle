@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from datetime import datetime
 import os
+import re
 
 # Create screenshots directory
 os.makedirs("screenshots", exist_ok=True)
@@ -11,7 +12,7 @@ os.makedirs("screenshots", exist_ok=True)
 def before_all(context):
     # Set up Chrome options for headless mode
     options = Options()
-    options.add_argument("--headless=new")  # Run in headless mode (no GUI)
+    options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-gpu")
     options.add_argument("--disable-dev-shm-usage")
@@ -29,8 +30,11 @@ def after_all(context):
         context.behave_driver.quit()
 
 def after_step(context, step):
-    """Take screenshot on failure"""
+    """Take screenshot on failure with clean filenames"""
     if step.status == "failed":
-        ts = datetime.now().strftime("%H%M%S")
-        filename = f"screenshots/{step.name[:40].replace(' ', '_')}_{ts}.png"
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        # Remove invalid characters for filenames
+        clean_name = re.sub(r'[<>:"/\\|?*\r\n]', '_', step.name)
+        clean_name = clean_name[:40]
+        filename = f"screenshots/{clean_name}_{ts}.png"
         context.behave_driver.save_screenshot(filename)
