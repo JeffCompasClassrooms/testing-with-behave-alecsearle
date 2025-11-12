@@ -37,14 +37,36 @@ jobs:
           python -m pip install --upgrade pip
           pip install behave selenium behave-webdriver webdriver-manager
 
-      - name: Run behave tests
+      - name: Run candymapper behave tests
         run: |
+          cd candymapper
           behave --no-capture --format plain
 
-      - name: Upload screenshots on failure
+      - name: Run peppers-ghost behave tests
+        run: |
+          cd peppers-ghost
+          behave --no-capture --format plain
+
+      - name: Upload candymapper screenshots on failure
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: test-failure-screenshots
+          name: candymapper-failure-screenshots
+          path: candymapper/screenshots/
+          if-no-files-found: ignore
+
+      - name: Upload peppers-ghost screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: peppers-ghost-failure-screenshots
+          path: peppers-ghost/screenshots/
+          if-no-files-found: ignore
+
+      - name: Upload root screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: root-failure-screenshots
           path: screenshots/
           if-no-files-found: ignore
